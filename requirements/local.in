@@ -1,0 +1,21 @@
+-r base.in
+
+# Debug UX
+django-debug-toolbar>=6.3
+
+# Shell mejorada
+ipython
+
+# Linter / formatter
+ruff
+
+# Testing
+pytest-django
+pytest-cov
+factory-boy
+
+# Tooling para compilar lockfiles
+pip-tools
+
+# Git hooks
+pre-commit

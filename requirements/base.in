@@ -1,0 +1,12 @@
+# Core framework
+Django>=6.0,<6.1
+
+# Settings y variables de entorno
+django-environ>=0.13
+
+# Driver PostgreSQL (con binarios precompilados)
+psycopg[binary]>=3.3
+
+
+# Image processing (ImageField para fotos de perfil, etc.)
+Pillow>=10.4

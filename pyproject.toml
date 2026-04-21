@@ -1,0 +1,57 @@
+[project]
+name = "base-project"
+version = "0.1.0"
+requires-python = ">=3.14"
+
+# ──────────────────────────────────────────────────────────────────────────
+# Ruff — https://docs.astral.sh/ruff/
+# ──────────────────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+extend-exclude = [
+    "*/migrations/*",
+    ".venv_bp",
+    "staticfiles",
+    "media",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort (ordenar imports)
+    "UP",   # pyupgrade (sintaxis moderna)
+    "B",    # flake8-bugbear (bugs comunes)
+    "C4",   # flake8-comprehensions
+    "SIM",  # flake8-simplify
+    "DJ",   # flake8-django (buenas prácticas Django)
+    "T20",  # flake8-print (prohíbe `print()` en prod)
+    "RUF",  # ruff-specific
+]
+ignore = [
+    "E501",   # line too long (ya lo maneja el formatter)
+    "DJ001",  # null=True in string-based fields (a veces es legítimo)
+    "RUF012", # Django usa class attrs mutables en Meta como patrón idiomático
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/settings/*.py" = ["F403", "F405"]  # permitir `from .base import *`
+"**/tests/*.py" = ["S101"]             # permitir `assert` en tests
+
+[tool.ruff.lint.isort]
+known-first-party = ["apps", "config"]
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+docstring-code-format = true
