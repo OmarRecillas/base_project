@@ -1,0 +1,27 @@
+# Core framework
+Django>=6.0,<6.1
+
+# Settings y variables de entorno
+django-environ>=0.13
+
+# Driver PostgreSQL (con binarios precompilados)
+psycopg[binary]>=3.3
+
+# Image processing (ImageField para fotos de perfil, etc.)
+Pillow>=10.4
+
+# Logging
+python-json-logger>=3.2
+
+# Static files (WhiteNoise sirve static en todos los entornos)
+whitenoise>=6.6
+
+# API framework
+djangorestframework>=3.15
+djangorestframework-simplejwt>=5.3
+
+# CORS para que frontends puedan consumir la API
+django-cors-headers>=4.4
+
+# OpenAPI / Swagger schema
+drf-spectacular>=0.27

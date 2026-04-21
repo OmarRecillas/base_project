@@ -1,0 +1,9 @@
+-r base.in
+
+# Servidor WSGI
+gunicorn>=23.0
+
+# Monitoring
+sentry-sdk[django]>=2.0
+
+django-storages[s3]>=1.14
