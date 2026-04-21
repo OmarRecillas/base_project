@@ -1,5 +1,7 @@
 from .production import *
 
+LOGGING["handlers"]["console"]["formatter"] = "json"
+
 DEBUG = False
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["uat.tu-dominio.com"])
 

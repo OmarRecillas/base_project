@@ -1,5 +1,14 @@
 from .base import *
 
+# Producción usa JSON estructurado para CloudWatch/Datadog/etc.
+LOGGING["handlers"]["console"]["formatter"] = "json"
+# DisallowedHost se dispara por bots/scanners; silenciar el ruido
+LOGGING["loggers"]["django.security.DisallowedHost"] = {
+    "level": "ERROR",
+    "handlers": ["console"],
+    "propagate": False,
+}
+
 DEBUG = False
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
 
@@ -19,27 +28,36 @@ SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 ADMINS = [env("DJANGO_ADMIN_EMAIL")]
 
 STORAGES = {
-    "default": {"BACKEND": "storages.backends.s3.S3Storage"},
-    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"},
-}
-
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"
-        }
-    },
-    "handlers": {
-        "console": {"class": "logging.StreamHandler", "formatter": "verbose"},
-    },
-    "root": {"handlers": ["console"], "level": "INFO"},
-    "loggers": {
-        "django.security.DisallowedHost": {
-            "level": "ERROR",
-            "handlers": ["console"],
-            "propagate": False,
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "bucket_name": env.str("AWS_STORAGE_BUCKET_NAME"),
+            "region_name": env.str("AWS_S3_REGION_NAME", default="us-east-1"),
+            "access_key": env.str("AWS_ACCESS_KEY_ID"),
+            "secret_key": env.str("AWS_SECRET_ACCESS_KEY"),
+            "querystring_auth": True,
+            "signature_version": "s3v4",
+            "default_acl": None,
         },
     },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
 }
+
+# WhiteNoise: cache de 1 año (el hash del manifest evita problemas de invalidación)
+WHITENOISE_MAX_AGE = 60 * 60 * 24 * 365
+WHITENOISE_INDEX_FILE = False
+# Archivos ya comprimidos (no re-gzip)
+WHITENOISE_SKIP_COMPRESS_EXTENSIONS = (
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "webp",
+    "zip",
+    "gz",
+    "br",
+    "woff",
+    "woff2",
+)

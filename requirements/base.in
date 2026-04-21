@@ -7,6 +7,11 @@ django-environ>=0.13
 # Driver PostgreSQL (con binarios precompilados)
 psycopg[binary]>=3.3
 
-
 # Image processing (ImageField para fotos de perfil, etc.)
 Pillow>=10.4
+
+# Logging
+python-json-logger>=3.2
+
+# Static files (WhiteNoise sirve static en todos los entornos)
+whitenoise>=6.6

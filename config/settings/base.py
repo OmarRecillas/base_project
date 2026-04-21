@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import environ
@@ -32,6 +33,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -73,9 +75,82 @@ LANGUAGE_CODE = "es-pe"
 TIME_ZONE = "America/Lima"
 USE_I18N = True
 USE_TZ = True
-STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"]
-MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR.parent, "staticfiles")
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR.parent, "mediafiles")
 AUTH_USER_MODEL = "users.User"
+
+# ──────────────────────────────────────────────────────────────
+# Logging
+# ──────────────────────────────────────────────────────────────
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        # Humano — para desarrollo local
+        "verbose": {
+            "format": "[{asctime}] {levelname} {name} | {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+        # JSON — para producción y UAT
+        "json": {
+            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+            "format": "%(asctime)s %(levelname)s %(name)s %(message)s %(pathname)s %(lineno)d",
+            "rename_fields": {"asctime": "timestamp", "levelname": "level"},
+            "datefmt": "%Y-%m-%dT%H:%M:%S%z",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",  # override en local/test, json en prod
+            "level": "INFO",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": env.str("DJANGO_LOG_LEVEL", default="INFO"),
+    },
+    "loggers": {
+        # Framework logs de Django (requests, ORM, migrations, etc.)
+        "django": {
+            "handlers": ["console"],
+            "level": env.str("DJANGO_LOG_LEVEL", default="INFO"),
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "ERROR",  # solo 4xx/5xx, no ruido
+            "propagate": False,
+        },
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "WARNING",  # las queries SQL solo cuando DEBUG_SQL=True
+            "propagate": False,
+        },
+        # Tu código
+        "apps": {
+            "handlers": ["console"],
+            "level": env.str("APPS_LOG_LEVEL", default="INFO"),
+            "propagate": False,
+        },
+    },
+}
+
+# ──────────────────────────────────────────────────────────────
+# Storages (Django 4.2+ API)
+# ──────────────────────────────────────────────────────────────
+STORAGES = {
+    "default": {
+        # Media local por default; production.py la sobrescribe con S3
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        # WhiteNoise sirve static en todos los entornos.
+        # En local no estorba (Django en DEBUG sirve static igual).
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}

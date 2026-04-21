@@ -3,6 +3,11 @@ import warnings
 
 from .base import *
 
+# En tests silenciamos logs para no contaminar el output de pytest
+LOGGING["root"]["level"] = "CRITICAL"
+LOGGING["loggers"]["django"]["level"] = "CRITICAL"
+LOGGING["loggers"]["apps"]["level"] = "CRITICAL"
+
 DEBUG = False
 
 # Hasher rápido: los tests no necesitan seguridad criptográfica
