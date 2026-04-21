@@ -55,3 +55,64 @@ quote-style = "double"
 indent-style = "space"
 line-ending = "auto"
 docstring-code-format = true
+
+# ──────────────────────────────────────────────────────────────
+# Pytest
+# ──────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+python_files = ["test_*.py", "*_test.py", "tests.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",      # obliga a declarar markers en esta config
+    "--strict-config",       # falla si hay typos en la config
+    "--tb=short",            # traza de error corta y legible
+    "-ra",                   # muestra resumen de tests skipped/failed al final
+    "--reuse-db",            # no recrea la BD de test en cada corrida (rápido)
+]
+testpaths = ["apps", "tests"]
+markers = [
+    "slow: tests lentos (> 1s) que se pueden skipear con -m 'not slow'",
+    "integration: tests que tocan servicios externos (db, API, etc.)",
+    "unit: tests unitarios puros (sin I/O)",
+]
+filterwarnings = [
+    "error",                                          # warnings fallan los tests por defecto
+    "ignore::DeprecationWarning:factory.*",           # factory-boy emite alguno benigno
+    "ignore::PendingDeprecationWarning",
+]
+
+# ──────────────────────────────────────────────────────────────
+# Coverage
+# ──────────────────────────────────────────────────────────────
+[tool.coverage.run]
+source = ["apps"]
+branch = true
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "*/admin.py",                 # admin suele ser UI, poco valor en cobertura
+    "*/apps.py",
+    "manage.py",
+    "config/wsgi.py",
+    "config/asgi.py",
+    "config/settings/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+precision = 2
+fail_under = 70           # falla si la cobertura global < 70%
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "def __repr__",
+    "def __str__",         # los __str__ triviales no aportan cobertura real
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
