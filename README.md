@@ -159,6 +159,11 @@ Por defecto:
 pip-compile requirements/local.in --output-file requirements/local.txt \
     --generate-hashes --allow-unsafe
 
+#pip-compile requirements/base.in --output-file requirements/base.txt --generate-hashes --allow-unsafe
+#pip-compile requirements/local.in --output-file requirements/local.txt --generate-hashes --allow-unsafe
+#pip-compile requirements/uat.in --output-file requirements/uat.txt --generate-hashes --allow-unsafe
+#pip-compile requirements/production.in --output-file requirements/production.txt --generate-hashes --allow-unsafe
+
 # Sincronizar el venv exactamente con el lockfile
 pip-sync requirements/local.txt
 ```
